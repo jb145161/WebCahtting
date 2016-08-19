@@ -1,0 +1,83 @@
+doctype html
+html(lang='en')
+    head
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        | 		
+        link(rel='stylesheet', type='text/css', href='bootstrap/css/bootstrap.css')
+        // Website CSS style
+        link(rel='stylesheet', type='text/css', href='stylesheets/register.css')
+        // Website Font style
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css')
+        // Google Fonts
+        link(href='https://fonts.googleapis.com/css?family=Passion+One', rel='stylesheet', type='text/css')
+        | 		
+        link(href='https://fonts.googleapis.com/css?family=Oxygen', rel='stylesheet', type='text/css')
+        | 		
+        title Admin
+    | 	
+    body
+        .container
+            .row.main
+                .panel-heading
+                    .panel-title.text-center
+                        h1.title Company Name
+                        | 	               		
+                        hr
+                |  
+                | 				
+                .main-login.main-center
+                    form#registForm.form-horizontal(method='post', action='registerMember')
+                        .form-group
+                            label.cols-sm-2.control-label(for='id') Your ID
+                            | 							
+                            .cols-sm-10
+                                .input-group
+                                    span.input-group-addon
+                                        i.fa.fa-user.fa(aria-hidden='true')
+                                    | 									
+                                    input#name.form-control(type='text', name='id', placeholder='Enter your ID')
+                        |				
+                        .form-group
+                            label.cols-sm-2.control-label(for='name') Username
+                            | 							
+                            .cols-sm-10
+                                .input-group
+                                    span.input-group-addon
+                                        i.fa.fa-users.fa(aria-hidden='true')
+                                    | 									
+                                    input#username.form-control(type='text', name='name', placeholder='Enter your Username')
+                        | 						
+                        .form-group
+                            label.cols-sm-2.control-label(for='password') Password
+                            | 							
+                            .cols-sm-10
+                                .input-group
+                                    span.input-group-addon
+                                        i.fa.fa-lock.fa-lg(aria-hidden='true')
+                                    | 									
+                                    input#password.form-control(type='password', name='password', placeholder='Enter your Password')
+                        | 						
+                        .form-group
+                            label.cols-sm-2.control-label(for='confirm') Confirm Password
+                            | 							
+                            .cols-sm-10
+                                .input-group
+                                    span.input-group-addon
+                                        i.fa.fa-lock.fa-lg(aria-hidden='true')
+                                    | 									
+                                    input#confirm.form-control(type='password', name='confirm', placeholder='Confirm your Password')
+                        | 						
+                        .form-group
+                            button#registBtn.btn.btn-primary.btn-lg.btn-block.login-button(type='button') Register
+                        | 						
+                        .login-register
+                            a(href='/') Login
+        
+        script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js') 		
+        script(type='text/javascript', src='bootstrap/js/bootstrap.js')
+        script.
+            $('#registBtn').click(function(){
+            	$('#registForm').submit();
+            });
+            
+        
