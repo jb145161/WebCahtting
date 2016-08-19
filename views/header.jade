@@ -1,1 +1,31 @@
-h1 this is Header
+div(role='tabpanel')
+// Nav tabs
+ul.nav.nav-tabs(role='tablist')
+    li.active(role='presentation')
+        a(href='#chatts', aria-controls='home', role='tab', data-toggle='tab')
+            h1
+                span.glyphicon.glyphicon-envelope(aria-hidden='true')
+    |     
+    li(role='presentation')
+        a(href='#friendList', aria-controls='profile', role='tab', data-toggle='tab')
+            h1
+                span.glyphicon.glyphicon-user(aria-hidden='true')
+    |     
+    li(role='presentation')
+        a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab')
+            h1
+                span.glyphicon.glyphicon-bell(aria-hidden='true')
+    |     
+    li(role='presentation')
+        a(href='#addFriend', aria-controls='settings', role='tab', data-toggle='tab')
+            h1
+                span.glyphicon.glyphicon-search(aria-hidden='true')
+            // Tab panes
+    .tab-content
+        #chatts.tab-pane.active(role='tabpanel')
+        |     
+        #friendList.tab-pane(role='tabpanel')
+        |     
+        #messages.tab-pane(role='tabpanel')
+        |     
+        #addFriend.tab-pane(role='tabpanel')
