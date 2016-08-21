@@ -2,30 +2,42 @@ div(role='tabpanel')
 // Nav tabs
 ul.nav.nav-tabs(role='tablist')
     li.active(role='presentation')
-        a(href='#chatts', aria-controls='home', role='tab', data-toggle='tab')
+        a#chatts(href='#chatts', aria-controls='home', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-envelope(aria-hidden='true')
     |     
     li(role='presentation')
-        a(href='#friendList', aria-controls='profile', role='tab', data-toggle='tab')
+        a#friendList(href='#friendList', aria-controls='profile', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-user(aria-hidden='true')
     |     
     li(role='presentation')
-        a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab')
+        a#message(href='#messages', aria-controls='messages', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-bell(aria-hidden='true')
     |     
     li(role='presentation')
-        a(href='#addFriend', aria-controls='settings', role='tab', data-toggle='tab')
+        a#addFriend(href='#addFriend', aria-controls='settings', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-search(aria-hidden='true')
-            // Tab panes
-    .tab-content
-        #chatts.tab-pane.active(role='tabpanel')
-        |     
-        #friendList.tab-pane(role='tabpanel')
-        |     
-        #messages.tab-pane(role='tabpanel')
-        |     
-        #addFriend.tab-pane(role='tabpanel')
+    // Tab panes
+.tab-content
+    #home.tab-pane.active(role='tabpanel') ...
+    |     
+    #profile.tab-pane(role='tabpanel') ...
+    |     
+    #messages.tab-pane(role='tabpanel') ...
+    |     
+    #settings.tab-pane(role='tabpanel')
+        form.form-inline
+            .form-group
+                label.sr-only(for='exampleInputAmount') Amount (in dollars)
+                |     
+                    .input-group
+                        .input-group-addon $
+                        |       
+                        input#exampleInputAmount.form-control(type='text', placeholder='Amount')
+                        |       
+                        .input-group-addon .00
+            |
+            button.btn.btn-primary(type='submit') Transfer cash

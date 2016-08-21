@@ -14,19 +14,15 @@ html
     script(src='bootstrap/js/bootstrap.min.js')
     //제이쿼리
     script(src='js/jquery-3.1.0.min.js')
+    //소켓 io
+    script(src='../socket.io/socket.io.js')
     
     link(rel='stylesheet', href='stylesheets/login.css')
     
     link(rel='stylesheet', href='/stylesheets/style.css')
-    script.
-      $( document ).ready(function(){
-        $('#myTab a').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-        });
-        
-        
-      });
+    //클릭 이벤트들 제어하는 파일
+    script(src='./js/clickevent.js')
+      
   body
     include header
     block content
