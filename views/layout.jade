@@ -12,6 +12,8 @@ html
     link(rel='stylesheet', href='bootstrap/css/bootstrap-theme.min.css')
     // 합쳐지고 최소화된 최신 자바스크립트
     script(src='bootstrap/js/bootstrap.min.js')
+    
+    script(src='bootstrap/js/bootstrap.js')
     //제이쿼리
     script(src='js/jquery-3.1.0.min.js')
     //소켓 io
@@ -20,10 +22,14 @@ html
     link(rel='stylesheet', href='stylesheets/login.css')
     
     link(rel='stylesheet', href='/stylesheets/style.css')
+    //처음에 데이터들을 읽어오는 파일
+    script(src='./js/readsData.js')
     //클릭 이벤트들 제어하는 파일
     script(src='./js/clickevent.js')
-      
-  body
+    //io이벤트 제어 파일
+    script(src='./js/ioEvent.js')
+    //윈도우 창이 닫히기 전에 실행되는 메소드. ioEvent에서 소켓해제
+  body(onbeforeunload="closeIt()") 
     include header
     block content
-    include footer
+ //   include footer

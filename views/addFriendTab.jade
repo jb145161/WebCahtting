@@ -1,0 +1,18 @@
+#addFriend.tab-pane(role='tabpanel') 
+    form.form-inline(style='margin-top: 20px;')
+        .form-group
+            label.sr-only(for='exampleInputAmount') Amount (in dollars)
+            |     
+            .input-group
+                .input-group-addon ID
+                |       
+                input#findID.form-control(type='text', placeholder='User ID')
+                
+        |   
+        button#findFriendBtn.btn.btn-primary(type='submit')
+            span.glyphicon.glyphicon-search(aria-hidden='true')
+            
+    #indexBox(style='margin-top:30px;') 
+        label#findIDResult(style='margin-right:30px; font-size:20px;') 
+        button#friendRequest.btn.btn-primary 친구추가요청
+        

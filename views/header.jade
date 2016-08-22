@@ -2,7 +2,7 @@ div(role='tabpanel')
 // Nav tabs
 ul.nav.nav-tabs(role='tablist')
     li.active(role='presentation')
-        a#chatts(href='#chatts', aria-controls='home', role='tab', data-toggle='tab')
+        a#chatts(href='#home', aria-controls='home', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-envelope(aria-hidden='true')
     |     
@@ -15,6 +15,7 @@ ul.nav.nav-tabs(role='tablist')
         a#message(href='#messages', aria-controls='messages', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-bell(aria-hidden='true')
+                    span#friendRequestCount(style='color:red;')
     |     
     li(role='presentation')
         a#addFriends(href='#addFriend', aria-controls='addFriend', role='tab', data-toggle='tab')
@@ -26,19 +27,8 @@ ul.nav.nav-tabs(role='tablist')
     |     
     #friendList.tab-pane(role='tabpanel') 
     |     
-    #messages.tab-pane(role='tabpanel') 
+    include messages
     |     
-    #addFriend.tab-pane(role='tabpanel') 
-        form.form-inline(style='margin-top: 20px;' action='ajax/findUser' method='post')
-            .form-group
-                label.sr-only(for='exampleInputAmount') Amount (in dollars)
-                |     
-                .input-group
-                    .input-group-addon ID
-                    |       
-                    input#exampleInputAmount.form-control(type='text', placeholder='User ID')
-                    
-            |   
-            button.btn.btn-primary(type='submit')
-                span.glyphicon.glyphicon-search(aria-hidden='true')
+    include addFriendTab
+                
 
