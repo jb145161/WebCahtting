@@ -7,7 +7,7 @@ ul.nav.nav-tabs(role='tablist')
                 span.glyphicon.glyphicon-envelope(aria-hidden='true')
     |     
     li(role='presentation')
-        a#friendList(href='#friendList', aria-controls='profile', role='tab', data-toggle='tab')
+        a#friendLists(href='#friendList', aria-controls='friendList', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-user(aria-hidden='true')
     |     
@@ -17,27 +17,28 @@ ul.nav.nav-tabs(role='tablist')
                 span.glyphicon.glyphicon-bell(aria-hidden='true')
     |     
     li(role='presentation')
-        a#addFriend(href='#addFriend', aria-controls='settings', role='tab', data-toggle='tab')
+        a#addFriends(href='#addFriend', aria-controls='addFriend', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-search(aria-hidden='true')
     // Tab panes
 .tab-content
-    #home.tab-pane.active(role='tabpanel') ...
+    #home.tab-pane.active(role='tabpanel') 
     |     
-    #profile.tab-pane(role='tabpanel') ...
+    #friendList.tab-pane(role='tabpanel') 
     |     
-    #messages.tab-pane(role='tabpanel') ...
+    #messages.tab-pane(role='tabpanel') 
     |     
-    #settings.tab-pane(role='tabpanel')
-        form.form-inline
+    #addFriend.tab-pane(role='tabpanel') 
+        form.form-inline(style='margin-top: 20px;' action='ajax/findUser' method='post')
             .form-group
                 label.sr-only(for='exampleInputAmount') Amount (in dollars)
                 |     
-                    .input-group
-                        .input-group-addon $
-                        |       
-                        input#exampleInputAmount.form-control(type='text', placeholder='Amount')
-                        |       
-                        .input-group-addon .00
-            |
-            button.btn.btn-primary(type='submit') Transfer cash
+                .input-group
+                    .input-group-addon ID
+                    |       
+                    input#exampleInputAmount.form-control(type='text', placeholder='User ID')
+                    
+            |   
+            button.btn.btn-primary(type='submit')
+                span.glyphicon.glyphicon-search(aria-hidden='true')
+
