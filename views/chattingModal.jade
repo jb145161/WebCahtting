@@ -1,0 +1,22 @@
+// Button trigger modal
+button.btn.btn-primary.btn-lg(id='modalBtn',type='button', data-toggle='modal', data-target='#myModal',style='display:none;')
+    | Launch demo modal
+// Modal
+#myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+            .modal-header
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                |         
+                h4#myModalLabel.modal-title Modal title
+            |       
+            .modal-body
+                | ...
+            |       
+            .modal-footer
+                input(type='text', placeholder='message' style='width=500px; float:left;')
+                
+                button.btn.btn-default(type='button', data-dismiss='modal') Close
+                |         
+                button.btn.btn-primary(type='button') sendMessage

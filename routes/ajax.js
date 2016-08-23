@@ -14,6 +14,18 @@ var client = mysql.createConnection({
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
+//유저의 정보 요청 처리
+router.post('/readUserInfo', function(req, res){
+	var id = req.body.id;
+	client.query('select id, name from member where id=?', [id], function(error, result){
+		if(error){
+			console.log(error);
+		}else{
+			res.send(result);
+		}
+	});
+});
+
 //친구찾기
 router.post('/findFriend', function(req, res){
 	var findID = req.body.id;
@@ -36,7 +48,7 @@ router.post('/friendRequest', function(req, res){
 	var toId = req.body.findIDResult;
 	
 	
-	client.query('insert into requestFriend values(?,?,now())',[fromId, toId],
+	client.query('insert into requestFriend(fromId,toId,requestDate) values(?,?,now())',[fromId, toId],
 			function(error){
 		if(error) {
 			console.log(error);
@@ -56,6 +68,44 @@ router.post('/readRequests', function(req, res){
 			res.send(result);
 		}
 	});
+});
+//처음 접속 시 모든 친구들 읽어옴
+router.post('/readFriends',function(req,res){
+	var id = req.body.id;
+	client.query('select myfriendsid, myfriendname, roomnum from friends where id=?',[id],
+			function(error, result){
+		if(error){
+			console.log(error)
+		}else{
+			res.send(result);
+		}
+	})
+	
+});
+//친구요청을 수락함
+router.post('/acceptRequest', function(req, res){
+	var fromId = req.body.fromId;
+	var toId = req.body.toId;
+	client.query('insert into friends values(?, ?, -1, (select name from member where id = ?))',
+			[fromId, toId, toId],	function(error){
+		if(error){
+			console.log(error);
+			return;
+		}
+	});
+	client.query('insert into friends values(?, ?, -1, (select name from member where id = ?))',
+			[toId, fromId, fromId], function(error){
+		if(error){
+			console.log(error);
+		}
+	});
+	client.query('delete from requestFriend where fromId=? and toId=?', [fromId, toId],
+			function(error){
+		if(error){
+			console.log(error);
+		}
+	});
+	res.send('success');
 });
 
 module.exports = router;

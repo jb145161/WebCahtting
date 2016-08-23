@@ -10,6 +10,7 @@ ul.nav.nav-tabs(role='tablist')
         a#friendLists(href='#friendList', aria-controls='friendList', role='tab', data-toggle='tab')
             h1
                 span.glyphicon.glyphicon-user(aria-hidden='true')
+                    span#friendAcceptCount(style='color:red;')
     |     
     li(role='presentation')
         a#message(href='#messages', aria-controls='messages', role='tab', data-toggle='tab')
@@ -25,7 +26,7 @@ ul.nav.nav-tabs(role='tablist')
 .tab-content
     #home.tab-pane.active(role='tabpanel') 
     |     
-    #friendList.tab-pane(role='tabpanel') 
+    include friendList 
     |     
     include messages
     |     
