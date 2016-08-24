@@ -107,5 +107,85 @@ router.post('/acceptRequest', function(req, res){
 	});
 	res.send('success');
 });
+//새로운 방을 만드는 요청
+router.post('/createNewRoom', function(req, res){
+	var target = req.body.target;
+	var id=req.body.id;
+	client.beginTransaction(function(error){		//커넥션 시작
+		if(error){
+			console.log(error);
+			throw error;
+		}
+		client.query('insert into roomnumseq value()', function(error){
+			if(error){
+				console.log(error);
+				client.rollback(function(){
+					console.error('rollback error');
+                    throw error;
+				});
+				throw error;
+			}//if error
+			console.log('create roomnum');
+			client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?)',
+					[target], function(error){
+				if(error){
+					console.log(error);
+					client.rollback(function(){
+						console.error('rollback error');
+	                    throw error;
+					});
+					throw error;
+				}//if error
+				console.log('insert into target');
+				client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?)',
+						[id], function(error){
+					if(error){
+						console.log(error);
+						client.rollback(function(){
+							console.error('rollback error');
+		                    throw error;
+						});
+						throw error;
+					}//if error
+					console.log('insert into id');
+					client.query('update friends set roomnum=(select LAST_INSERT_ID())'+
+							' where (id=? and myFriendsId=?) or (id=? and myFriendsId=?)',
+							[id, target, target, id], function(error){
+						if(error){
+							console.log(error);
+							client.rollback(function(){
+								console.error('rollback error');
+			                    throw error;
+							});
+							throw error;
+						}//if error
+						client.query('select LAST_INSERT_ID() as roomNum',	//생성한 방넘버 전달
+								function(error, result){
+							if(error){
+								console.log(error);
+								client.rollback(function(){
+									console.error('rollback error');
+				                    throw error;
+								});
+								throw error;
+							}//if error
+							client.commit(function(error){
+								if(error){
+									console.log(error);
+									client.rollback(function(){
+										console.error('rollback error');
+					                    throw error;
+									});
+									throw error;
+								}//if error
+								res.send(result);
+							});//commit
+						});//fifth query
+					});//fourth query
+				});//third query
+			});//second query
+		});// first query
+	});
+});
 
 module.exports = router;

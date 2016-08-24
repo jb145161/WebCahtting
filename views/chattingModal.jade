@@ -12,11 +12,13 @@ button.btn.btn-primary.btn-lg(id='modalBtn',type='button', data-toggle='modal', 
                 h4#myModalLabel.modal-title Modal title
             |       
             .modal-body
-                | ...
+                textarea.form-control(rows='25' readonly='readonly' style='resize:none;')
             |       
             .modal-footer
-                input(type='text', placeholder='message' style='width=500px; float:left;')
-                
-                button.btn.btn-default(type='button', data-dismiss='modal') Close
-                |         
-                button.btn.btn-primary(type='button') sendMessage
+                form.form-inline
+                    .form-group(style='float:left;')
+                        input#chattTextInput.form-control(type='text', placeholder='message')
+                    .form-group
+                        button.btn.btn-default(type='button', data-dismiss='modal') Close
+                        |         
+                        button.btn.btn-primary(type='button') sendMessage

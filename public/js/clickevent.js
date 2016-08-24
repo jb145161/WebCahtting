@@ -98,12 +98,44 @@ $( document ).ready(function(){
 	});
 	
 	$(document).on('dblclick', '.openChatting', function(){
-		var roomNum = $(this).attr('roomnum');
-		if(roomNum==-1){
-			$('#modalBtn').click(); //모달창 호출
-		}else{
-			$('#modalBtn').click(); //모달창 호출
+		var tdObject = $(this);
+		var roomNum = tdObject.attr('roomnum');	//아직 방이 안만들어졌을 경우 -1, 아니면 다른숫자
+		var target = tdObject.attr('target');	//채팅을 하고자 하는 친구 아이디
+		var id = getCookie('id'); //내 아이디
+		if(roomNum==-1){	//방이 안만들어졌을 경우 방을 만드는 서비스 호출
+//			$('div.modal').modal(); //모달창 호출
+			$.ajax({
+				type:"POST",
+				url:"./ajax/createNewRoom",
+				data : {target : target,
+						id : id},
+				dataType : "json",
+				success: function(data){
+					var roomNum = data[0].roomNum;	//생성한 방 넘버를 읽어옴
+					tdObject.attr('roomnum', roomNum);  //친구목록에서 roomnum속성변경
+					$('#myModalLabel').attr('roomnum', roomNum); //모달창에 roomnum속성 주기
+					sendNewRoomNum(roomNum, target);
+				},
+				error: function(xhr, status, error) {
+					alert(error);
+				}   
+			});
+		}else{  //이미 생성된 방이 있을 경우
+//			$('div.modal').modal(); //모달창 호출
 		}
+		$('#myModalLabel').text(tdObject.text());	//모달창 제목에 상대편 이름 입력
+		$('div.modal').modal(); //모달창 호출
+		
 	});
+	
+	
+	//모달 오픈 이벤트 리스너
+	$('div.modal').on('show.bs.modal', function (e) {
+		
+		});
+	//모달 클로즈 이벤트 리스너
+	$('div.modal').on('hidden.bs.modal', function (e) {
+		
+		});
 	
 });
