@@ -126,7 +126,7 @@ router.post('/createNewRoom', function(req, res){
 				throw error;
 			}//if error
 			console.log('create roomnum');
-			client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?)',
+			client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?,0)',
 					[target], function(error){
 				if(error){
 					console.log(error);
@@ -137,7 +137,7 @@ router.post('/createNewRoom', function(req, res){
 					throw error;
 				}//if error
 				console.log('insert into target');
-				client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?)',
+				client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?,0)',
 						[id], function(error){
 					if(error){
 						console.log(error);
@@ -185,7 +185,97 @@ router.post('/createNewRoom', function(req, res){
 				});//third query
 			});//second query
 		});// first query
+	});//transaction 끝
+});
+//메세지를 보내는 요청 처리
+router.post('/sendMessage', function(req, res){
+	console.log('ajax 로 sendMessge 요청을 받았습니다.');
+	console.log('받은 데이터 = '+JSON.stringify(req.body));
+	var roomNum = req.body.roomNum;
+	var id = req.body.id;
+	var name = req.body.name;
+	var message = req.body.message;
+	var unreadPeople='';
+	client.beginTransaction(function(error){
+		if(error){
+			console.log(error);
+			throw error;
+		}
+		client.query('select id from chattingrooms where roomnum=?', [roomNum], 
+				function(error, result){
+			if(error){
+				console.log(error);
+				client.rollback(function(){
+					console.error('rollback error');
+                    throw error;
+				});
+				throw error;
+			}//if error
+			console.log('select chatting members : '+JSON.stringify(result));
+			result.forEach(function(obj, index){
+				unreadPeople += obj.id+'||';
+			});
+			unreadPeople = unreadPeople.slice(0, -2);	//마지막에 있는 ||문자열 제거
+			console.log('make unreadPeople : '+unreadPeople);
+			client.query('insert into messages values(?,?,?,?,sysdate(),?)',
+					[roomNum,id,name,message,unreadPeople], function(error){
+				if(error){
+					console.log(error);
+					client.rollback(function(){
+						console.error('rollback error');
+	                    throw error;
+					});
+					throw error;
+				}//if error
+				console.log('insert into messages');
+				chattingMemberIdArray = unreadPeople.split('||');
+				chattingMemberIdArray.forEach(function(chattingMemberId, index){
+					client.query('update chattingrooms set unreadMessageCount='+
+							'(unreadMessageCount+1) where roomnum=? and id=?',
+							[roomNum, chattingMemberId], function(error){
+						if(error){
+							console.log(error);
+							client.rollback(function(){
+								console.error('rollback error');
+			                    throw error;
+							});
+							throw error;
+						}//if error
+						console.log(chattingMemberId+"에게 안읽은 메세지 수 추가");
+					});
+				});
+				client.commit(function(error){
+					if(error){
+						console.log(error);
+						client.rollback(function(){
+							console.error('rollback error');
+		                    throw error;
+						});
+						throw error;
+					}//if error
+					res.send({result : 'success', unreadPeople : unreadPeople});
+				});//commit
+			});//second query
+		});//first query
+	});//transaction 끝
+});
+//채팅창을 열었을 때 모든 대화 내용을 표시해줌
+router.post('/readAllMessage', function(req, res){
+	var roomNum = req.body.roomNum;
+	client.query('select * from messages where roomNum=? order by sendDate', [roomNum], 
+			function(error,result){
+		if(error){
+			console.log(error);
+			throw error;
+		}
+		res.send(result);
 	});
+});
+//메세지를 읽었다는 사실을 알려주는 요청
+router.post('readMessage', function(req, res){
+	var roomNum = req.body.roomNum;
+	var id = req.body.id;
+	client.query('')
 });
 
 module.exports = router;

@@ -5,7 +5,7 @@ $( document ).ready(function(){
 		$(this).tab('show');
 	});
 
-
+//탭 클릭 이벤트
 	$('#chatts').click(function(e){
 //		$.ajax({
 //		type:"POST",
@@ -103,7 +103,6 @@ $( document ).ready(function(){
 		var target = tdObject.attr('target');	//채팅을 하고자 하는 친구 아이디
 		var id = getCookie('id'); //내 아이디
 		if(roomNum==-1){	//방이 안만들어졌을 경우 방을 만드는 서비스 호출
-//			$('div.modal').modal(); //모달창 호출
 			$.ajax({
 				type:"POST",
 				url:"./ajax/createNewRoom",
@@ -114,19 +113,87 @@ $( document ).ready(function(){
 					var roomNum = data[0].roomNum;	//생성한 방 넘버를 읽어옴
 					tdObject.attr('roomnum', roomNum);  //친구목록에서 roomnum속성변경
 					$('#myModalLabel').attr('roomnum', roomNum); //모달창에 roomnum속성 주기
-					sendNewRoomNum(roomNum, target);
+					sendNewRoomNum(roomNum, target);	//ioEvent메소드. io로 서버에 새로운
+														//방 생성 알림
 				},
 				error: function(xhr, status, error) {
 					alert(error);
 				}   
 			});
 		}else{  //이미 생성된 방이 있을 경우
-//			$('div.modal').modal(); //모달창 호출
+			$('#myModalLabel').attr('roomnum', roomNum);	//모달창에 roomnum속성 주기
+			joinRoom(roomNum, id);	//io로 서버에 roomNum socket에 들어가겠다고 요청
+			$.ajax({
+				type:"POST",
+				url:"./ajax/readAllMessage",
+				data : {roomNum : roomNum},
+				dataType : "json",
+				success: function(data){
+					data.forEach(function(obj, index){
+						var unreadCount = obj.unreadPeople.split('||').length;
+						$('#chattingArea').append('<div>'+obj.name+'<span class="label label-success">'+obj.sendDate+'</span>'+'</div>');
+						$('#chattingArea').append('<pre>'+obj.message+'<span class="label label-warning unreadCount">'+unreadCount+'</span></pre>');
+					});
+				},
+				error: function(xhr, status, error) {
+					alert(error);
+				}   
+			});
 		}
 		$('#myModalLabel').text(tdObject.text());	//모달창 제목에 상대편 이름 입력
 		$('div.modal').modal(); //모달창 호출
 		
 	});
+	
+	//채팅 send버튼 이벤트
+	$('#chattingSendBtn').click(function(e){
+		e.preventDefault();
+		var roomNum = $('#myModalLabel').attr('roomnum');
+		var id = getCookie('id');
+		var name = decodeURIComponent(getCookie('name'));	//cookie에 있는 값 디코드
+		var message = $('#chattTextInput').val();
+		alert(name);
+		$('#chattTextInput').val('');
+		$.ajax({
+			type:"POST",
+			url:"./ajax/sendMessage",
+			data : {roomNum : roomNum,
+					id : id,
+					name : name,
+					message : message},
+			dataType : "json",
+			success: function(data){
+				if(data.result=='success'){
+					var unreadPeople = data.unreadPeople;	//메세지 안 읽은 사람들 목록
+					sendMessageToIO(id, roomNum, message, unreadPeople);//ioEvent메소드. 서버에 메세지 전송
+				}
+			},
+			error: function(xhr, status, error) {
+				alert(error);
+			}   
+		});
+		
+	});
+	//서버로 ajax 요청을 통해 읽었다는 사실 전달
+	function readMessage(){
+		var roomNum = $('#myModalLabel').attr('roomnum');
+		var id = getCookie('id');
+		$.ajax({
+			type:"POST",
+			url:"./ajax/readMessage",
+			data : {roomNum : roomNum,
+					id : id},
+			dataType : "text",
+			success: function(data){
+				if(data=='success'){
+					alert(data);
+				}
+			},
+			error: function(xhr, status, error) {
+				alert(error);
+			}   
+		});
+	}
 	
 	
 	//모달 오픈 이벤트 리스너
@@ -135,7 +202,10 @@ $( document ).ready(function(){
 		});
 	//모달 클로즈 이벤트 리스너
 	$('div.modal').on('hidden.bs.modal', function (e) {
-		
+		var roomNum = $('#myModalLabel').attr('roomnum');
+		var id = getCookie('id');
+		leaveRoom(roomNum, id);		//io로 서버에 roomNum socekt 방을 나가겠다고 요청
+		$('#myModalLabel').removeAttr('roomnum');
 		});
 	
 });

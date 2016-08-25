@@ -12,7 +12,7 @@ button.btn.btn-primary.btn-lg(id='modalBtn',type='button', data-toggle='modal', 
                 h4#myModalLabel.modal-title Modal title
             |       
             .modal-body
-                textarea.form-control(rows='25' readonly='readonly' style='resize:none;')
+                #chattingArea.form-control(style='overflow:auto; height:600px;')
             |       
             .modal-footer
                 form.form-inline
@@ -21,4 +21,4 @@ button.btn.btn-primary.btn-lg(id='modalBtn',type='button', data-toggle='modal', 
                     .form-group
                         button.btn.btn-default(type='button', data-dismiss='modal') Close
                         |         
-                        button.btn.btn-primary(type='button') sendMessage
+                        button#chattingSendBtn.btn.btn-primary(type='submit') sendMessage

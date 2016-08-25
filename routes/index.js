@@ -25,7 +25,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/login', function(req, res, next) {
   var body = req.body;
-  client.query('select password from member where id=?',[body.id]
+  client.query('select password,name from member where id=?',[body.id]
   , function(error, result){
 	  if(error){
 		  console.log(error);
@@ -38,6 +38,7 @@ router.post('/login', function(req, res, next) {
 			  console.log(result[0].password);
 			  if(body.password==result[0].password){
 				  res.cookie('id', body.id);
+				  res.cookie('name', encodeURIComponent(result[0].name));//한글 인코딩 후 cookie
 				  res.render('index');
 			  }else{
 				  res.render('login', {result:'wrong password'});

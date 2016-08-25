@@ -55,8 +55,32 @@ $( document ).ready(function(){
 		});
 
 	});
+	//메세지 들어오면 발생하는 이벤트
+	socket.on('receiveMessage', function(data){
+		alert('메세지 도착 : '+JSON.stringify(data));
+	});
+	//해당하는 채팅창에 존재할 때 메세지가 들어오면 발생하는 이벤트
+	socket.on('receiveMessageToRoom', function(data){
+		alert('채팅 중 메세지 도착 : '+JSON.stringify(data));
+		readMessage();	//clickevent메소드. 서버로 ajax 요청을 통해 읽었다는 사실 전달
+	});
+	
 	
 });
+//io로 서버에 roomNum socket에 들어가겠다고 요청
+function joinRoom(roomNum, id){
+	socket.emit('joinRoom', {roomNum : roomNum, id : id});
+}
+//ioEvent메소드. 서버에 메세지 전송
+function sendMessageToIO(id, roomNum, message, unreadPeople){
+	var name = decodeURIComponent(getCookie('name'));	//cookie에 있는 값 decode
+	socket.emit('sendMessageToIO', {id : id, name : name, roomNum : roomNum,
+		message : message, unreadPeople: unreadPeople});
+}
+//io로 서버에 roomNum socekt 방을 나가겠다고 요청
+function leaveRoom(roomNum, id){
+	socket.emit('leaveRoom', {roomNum : roomNum, id : id});
+}
 //clickevent로부터 이벤트를 받아 서버로 새로운 방 생성 번호를 보낸다.
 function sendNewRoomNum(roomNum, target){
 	var id = getCookie('id');
@@ -78,6 +102,7 @@ function closeIt(){
 	socket.emit('disconnection');
 }
 
+// cName의 key를 갖는 cookie 값 value 추출
 function getCookie(cName) {
     cName = cName + '=';
     var cookieData = document.cookie;

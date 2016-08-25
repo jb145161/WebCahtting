@@ -44,6 +44,22 @@ io.sockets.on('connection', function(socket){
 		console.log(JSON.stringify(userList));
 		
 	});
+	//채팅 방 소켓에 들어올 시
+	socket.on('joinRoom', function(data){
+		var roomNum = data.roomNum;
+		var id = data.id;
+		//소켓멤버 조인
+		socket.join(roomNum);
+		console.log(id+'님이 '+roomNum+'번 소켓멤버로 join했습니다.');
+	});
+	//채팅 방 소켓에 나갈 시
+	socket.on('leaveRoom', function(data){
+		var roomNum = data.roomNum;
+		var id = data.id;
+		//소켓멤버 조인
+		socket.leave(roomNum);
+		console.log(id+'님이 '+roomNum+'번 소켓멤버를 leave했습니다.');
+	});
 	//친구 요청이 들어올 시
 	socket.on('sendFriendRequest', function(data){
 		var fromId=data.fromId; //요청한 아이디
@@ -91,10 +107,27 @@ io.sockets.on('connection', function(socket){
 		}
 		//소켓멤버 조인
 		socket.join(roomNum);
-		console.log(id+'님이 '+roomNum+'번 소켓멤버로 join했습니다.')
+		console.log(id+'님이 '+roomNum+'번 소켓멤버로 join했습니다.');
 	});
 	
-	
+	//메세지 전송 요청
+	socket.on('sendMessageToIO', function(data){
+		console.log('io로 메세지 전송 요청이 들어왔습니다 : '+JSON.stringify(data));
+		var roomNum = data.roomNum;
+		io.sockets.in(roomNum).emit('receiveMessageToRoom', data);	//채팅창을 열고 대화하는
+																	//사람들을 대상으로 이벤트 전송
+		var unreadPeople = data.unreadPeople;
+		unreadPepleIdArray = unreadPeople.split('||');	
+		unreadPepleIdArray.forEach(function(id, index){
+			var userObject = userList.get(id);
+			if(userObject != undefined){
+				var socketId = userObject.socketId;
+				io.sockets.to(socketId).emit('receiveMessage', data);
+			}
+		});
+		
+		
+	});
 	
 	
 });
