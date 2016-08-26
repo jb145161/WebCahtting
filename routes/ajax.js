@@ -82,6 +82,54 @@ router.post('/readFriends',function(req,res){
 	})
 	
 });
+//처음 접속 시 모든 채팅 룸 리스트 읽어옴
+router.post('/readChattingRoomList',function(req, res){
+	var id = req.body.id;
+	client.beginTransaction(function(error){	
+		if(error){
+			console.log(error);
+			throw error;
+		}
+		client.query('select * from chattingrooms where id = ?', [id],
+				function(error, result){
+			if(error){
+				console.log(error);
+				client.rollback(function(){
+					console.error('rollback error');
+                    throw error;
+				});
+				throw error;
+			}//if error
+			result.forEach(function(obj, index){
+					client.query('select e.name from member e, (select id from chattingrooms where '+
+							'roomnum = ? and id != ?) a where e.id = a.id', [obj.roomNum, id],
+							function(error, result2){
+						if(error){
+							console.log(error);
+							client.rollback(function(){
+								console.error('rollback error');
+			                    throw error;
+							});
+							throw error;
+						}//if error
+						console.log('해당 채팅룸 유저의 이름을 읽습니다 : '+JSON.stringify(result2));
+						result[index].names = result2;
+					});//for query
+			});
+			client.commit(function(error){
+				if(error){
+					console.log(error);
+					client.rollback(function(){
+						console.error('rollback error');
+	                    throw error;
+					});
+					throw error;
+				}//if error
+				res.send(result);
+			});//commit
+		});//first query
+	});//begin connection 
+});
 //친구요청을 수락함
 router.post('/acceptRequest', function(req, res){
 	var fromId = req.body.fromId;
@@ -272,10 +320,94 @@ router.post('/readAllMessage', function(req, res){
 	});
 });
 //메세지를 읽었다는 사실을 알려주는 요청
-router.post('readMessage', function(req, res){
+router.post('/readMessage', function(req, res){
 	var roomNum = req.body.roomNum;
 	var id = req.body.id;
-	client.query('')
+	client.beginTransaction(function(error){
+		if(error){
+			console.log(error);
+			throw error;
+		}
+		client.query('select unreadPeople from messages where roomNum=? order by sendDate desc',[roomNum],
+				function(error,result){
+			if(error){
+				console.log(error);
+				client.rollback(function(){
+					console.error('rollback error');
+                    throw error;
+				});
+				throw error;
+			}//if error
+			console.log('select unreadPeople :' +JSON.stringify(result));
+			
+			var count = 0;			//자신이 안읽은 메세지 숫자 담을 공간.
+			if(result.length ==1){
+				if(result[0].unreadPeople == id) {count = 1;}
+			}else{
+				result.forEach(function(obj, index){
+					var tempText = obj.unreadPeople;
+					var tempArray = tempText.split('||');
+					for(var key in tempArray){
+						if(id==tempArray[key]){
+							count += 1;
+							break;
+						}
+					}//for
+				});//forEach
+			}
+			console.log('get count : '+count);
+			
+			var unreadPeople = result[0].unreadPeople;
+			var unreadPeopleArray = unreadPeople.split('||');
+			var newUnreadPeople='';	//수정할 정보 담을 문자변수
+			for(var key in unreadPeopleArray){
+				if(unreadPeopleArray[key]!=id){
+					newUnreadPeople += unreadPeopleArray[key]+'||';
+				}
+			}//for
+			newUnreadPeople = newUnreadPeople.slice(0,-2);  //마지막에 있는 ||문자열 제거
+			console.log('make new UnreadPeople : '+newUnreadPeople);
+			
+			client.query('update messages set unreadPeople = ? where roomNum = ? and'+
+					' (unreadPeople Like ? or unreadPeople Like ? or unreadPeople = ?)',
+					[newUnreadPeople, roomNum, '%||'+id+'%', '%'+id+'||%', id], function(error){
+				if(error){
+					console.log(error);
+					client.rollback(function(){
+						console.error('rollback error');
+	                    throw error;
+					});
+					throw error;
+				}//if error
+				console.log('update messages unreadPeople');
+				client.query('update chattingrooms set unreadMessageCount = 0 where'+
+						' roomnum = ? and id = ?', [roomNum, id], function(error){
+					if(error){
+						console.log(error);
+						client.rollback(function(){
+							console.error('rollback error');
+		                    throw error;
+						});
+						throw error;
+					}//if error
+					console.log('update chattingrooms unreadCount set 0');
+					client.commit(function(error){
+						if(error){
+							console.log(error);
+							client.rollback(function(){
+								console.error('rollback error');
+			                    throw error;
+							});
+							throw error;
+						}//if error
+						console.log('commit');
+						res.send({result : 'success', count : count});
+					});//commit
+				})//third query
+			});//second query
+		});//first query
+	});//begin transaction 
+	
 });
 
 module.exports = router;

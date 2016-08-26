@@ -125,8 +125,20 @@ io.sockets.on('connection', function(socket){
 				io.sockets.to(socketId).emit('receiveMessage', data);
 			}
 		});
-		
-		
+	});
+	//IO를 통해 지금 방에 있는 사람들에게 unreadCount를 -1
+	socket.on('discountUnreadInRoom', function(data){
+		console.log('io로 메세지 안읽음 수를 줄여달라는 요청이 왔습니다.');
+		var roomNum = data.roomNum;
+		io.sockets.in(roomNum).emit('discountUnreadInRoom');  //지금 방에 있는 사람들에게 unreadCount를 -1
+	});
+	//IO를 통해 방에 입장해서 안읽은 메세지들에 대해서 안읽음 표시를 discount 해줄 것 요청
+	socket.on('discountUnread', function(data){
+		var roomNum = data.roomNum;
+		var count = data.count;
+		console.log('io로 새로 방에 들어가서 메세지를 읽었으니, 메세지 안읽음 수를 줄여달라는 요청이 왔습니다.');
+		console.log('data = '+JSON.stringify(data)+'count = '+count);
+		io.sockets.in(roomNum).emit('discountUnread', count);
 	});
 	
 	

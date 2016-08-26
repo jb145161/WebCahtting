@@ -31,23 +31,40 @@ myFriendName varchar(100) not null)
 
 create table chattingrooms(
 	roomnum int(5) not null,
-    id varchar(50) not null
+    id varchar(50) not null,
+    unreadMessageCount int(3) default 0
 )
 drop table chattingrooms
 create table roomnumseq(
 	roomnum int(5) not null auto_increment primary key
 )
 drop table roomnumseq
-insert into roomnumseq value();
+create table messages(
+	roomNum int(5) not null,
+    id varchar(50) not null,
+    name varchar(50) not null,
+    message text,
+	sendDatemessages datetime not null,
+    unreadPeople text
+)
 
+commit
 
+alter table messages drop unreadPopleCount
+
+alter table messages add column unreadPeople text
 alter table friends add column myFriendName varchar(100) not null
+- ALTER TABLE messages CHANGE unreadPople unreadPeople text
+
+alter table chattingrooms add column unreadMessage int(3) default 0
 
 SET SQL_SAFE_UPDATES=0;
 
 delete from friends
 
-drop table requestFriend
+drop table chattingrooms
+
+select e.name from member e, (select id from chattingrooms where roomnum = 38 and id != 'master') a where e.id = a.id
 
 delete from requestFriend
 

@@ -43,6 +43,18 @@ $( document ).ready(function(){
 			alert(error);
 		}   
 	});
-	
+	//제일 처음 접속하면 채팅 방 리스트들 나열
+	$.ajax({
+		type:"POST",
+		url:"/ajax/readChattingRoomList",
+		data : {id : id},
+		dataType : "json",
+		success: function(data){
+			alert(JSON.stringify(data));
+		},
+		error: function(xhr, status, error) {
+			alert(error);
+		}   
+	});
 	
 });

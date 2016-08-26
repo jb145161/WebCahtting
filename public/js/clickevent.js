@@ -131,18 +131,46 @@ $( document ).ready(function(){
 				success: function(data){
 					data.forEach(function(obj, index){
 						var unreadCount = obj.unreadPeople.split('||').length;
-						$('#chattingArea').append('<div>'+obj.name+'<span class="label label-success">'+obj.sendDate+'</span>'+'</div>');
-						$('#chattingArea').append('<pre>'+obj.message+'<span class="label label-warning unreadCount">'+unreadCount+'</span></pre>');
+						if(obj.unreadPeople===''){
+							unreadCount = 0;
+						}
+						var chattingArea = $('#chattingArea');
+						chattingArea.append('<div>'+obj.name+'<span class="label label-success">'+obj.sendDate+'</span>'+'</div>');
+						chattingArea.append('<pre>'+obj.message+'<span class="label label-warning unreadCount">'+unreadCount+'</span></pre>');
 					});
+					var roomNum = $('#myModalLabel').attr('roomnum');
+					var id = getCookie('id');
+					var count = 0;
+					$.ajax({
+						type:"POST",
+						url:"./ajax/readMessage",
+						data : {roomNum : roomNum,
+								id : id},
+						dataType : "json",
+						success: function(data){
+							if(data.result=='success'){
+								count = data.count;
+								discountUnread(roomNum, count);	//방에 입장해서 안읽은 메세지들에 대해서
+								//안읽음 표시를 discount 해줄 것 요청(ioevent 메서드)
+							}
+						},
+						error: function(xhr, status, error) {
+							alert(error);
+						}   
+					});
+					
 				},
 				error: function(xhr, status, error) {
 					alert(error);
 				}   
 			});
+			
 		}
+		
 		$('#myModalLabel').text(tdObject.text());	//모달창 제목에 상대편 이름 입력
 		$('div.modal').modal(); //모달창 호출
-		
+
+//		
 	});
 	
 	//채팅 send버튼 이벤트
@@ -174,30 +202,10 @@ $( document ).ready(function(){
 		});
 		
 	});
-	//서버로 ajax 요청을 통해 읽었다는 사실 전달
-	function readMessage(){
-		var roomNum = $('#myModalLabel').attr('roomnum');
-		var id = getCookie('id');
-		$.ajax({
-			type:"POST",
-			url:"./ajax/readMessage",
-			data : {roomNum : roomNum,
-					id : id},
-			dataType : "text",
-			success: function(data){
-				if(data=='success'){
-					alert(data);
-				}
-			},
-			error: function(xhr, status, error) {
-				alert(error);
-			}   
-		});
-	}
-	
 	
 	//모달 오픈 이벤트 리스너
-	$('div.modal').on('show.bs.modal', function (e) {
+	$('div.modal').on('shown.bs.modal', function (e) {
+		$('#chattingArea').scrollTop($('#chattingArea').prop('scrollHeight'));
 		
 		});
 	//모달 클로즈 이벤트 리스너
