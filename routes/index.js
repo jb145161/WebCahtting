@@ -1,14 +1,16 @@
 var express = require('express');
 var router = express.Router();
-var mysql = require('mysql');
+//var mysql = require('mysql');
+//
+//var client = mysql.createConnection({
+//	host:'localhost',
+//	user:'root',
+//	password:'1234',
+//	database: 'chatting',
+//	port: 3306
+//});
 
-var client = mysql.createConnection({
-	host:'localhost',
-	user:'root',
-	password:'1234',
-	database: 'chatting',
-	port: 3306
-});
+var client = require('../mysqlConfig');
 
 
 
@@ -63,9 +65,13 @@ router.post('/registerMember', function(req, res, next) {
 			  console.log(error);
 		  }else{
 			  if(result.length==0){
-				  client.query('insert into member values(?, ?, ?, sysdate())',
+				  client.query('insert into member values(?, ?, ?, sysdate(), 0,0,0)',
 						 [body.id, body.password, body.name], 
-						 function(){
+						 function(error){
+				    if(error){
+			        console.log(error);
+			      }
+				    console.log('insert Member');
 					  res.render('login', {result:'success'});
 				  });
 			  }else{

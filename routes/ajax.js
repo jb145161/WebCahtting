@@ -1,14 +1,16 @@
 var express = require('express');
 var router = express.Router();
-var mysql = require('mysql');
+//var mysql = require('mysql');
+//
+//var client = mysql.createConnection({
+//	host:'localhost',
+//	user:'root',
+//	password:'1234',
+//	database: 'chatting',
+//	port: 3306
+//});
 
-var client = mysql.createConnection({
-	host:'localhost',
-	user:'root',
-	password:'1234',
-	database: 'chatting',
-	port: 3306
-});
+var client = require('../mysqlConfig');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -100,9 +102,10 @@ router.post('/readChattingRoomList',function(req, res){
 				});
 				throw error;
 			}//if error
+			console.log('select chattingrooms : '+JSON.stringify(result));
 			result.forEach(function(obj, index){
 					client.query('select e.name from member e, (select id from chattingrooms where '+
-							'roomnum = ? and id != ?) a where e.id = a.id', [obj.roomNum, id],
+							'roomnum = ? and id != ?) a where e.id = a.id', [obj.roomnum, id],
 							function(error, result2){
 						if(error){
 							console.log(error);
@@ -115,7 +118,7 @@ router.post('/readChattingRoomList',function(req, res){
 						console.log('해당 채팅룸 유저의 이름을 읽습니다 : '+JSON.stringify(result2));
 						result[index].names = result2;
 					});//for query
-			});
+			});//forEach
 			client.commit(function(error){
 				if(error){
 					console.log(error);
@@ -338,8 +341,8 @@ router.post('/readMessage', function(req, res){
 				});
 				throw error;
 			}//if error
+			if(result.length == 0) return;
 			console.log('select unreadPeople :' +JSON.stringify(result));
-			
 			var count = 0;			//자신이 안읽은 메세지 숫자 담을 공간.
 			if(result.length ==1){
 				if(result[0].unreadPeople == id) {count = 1;}

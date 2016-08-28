@@ -44,7 +44,7 @@ create table messages(
     id varchar(50) not null,
     name varchar(50) not null,
     message text,
-	sendDatemessages datetime not null,
+	sendDate datetime not null,
     unreadPeople text
 )
 

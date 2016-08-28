@@ -57,7 +57,32 @@ $( document ).ready(function(){
 	});
 	//메세지 들어오면 발생하는 이벤트
 	socket.on('receiveMessage', function(data){
-		alert('메세지 도착 : '+JSON.stringify(data));
+	  alert('메세지 도착 : '+JSON.stringify(data));
+	  var roomNum = data.roomNum;
+	  var message = data.message;
+	  //해당 사용자의 방 리스트들 중에 이미 생성되어있는지 확인. 있으면 이미 있는 방 지우고 새로 append 해주기. 아니면 새로 append와 badge에 1추가
+	  //해당하는 룸넘버의 모달창이 열려있는지 확인 후 열려있으면 뱃지에 숫자 추가x, 아니면 추가.
+
+	  var chattingRoomList = $('.list-group-item'); //채팅룸 리스트
+
+	  for(var key in chattingRoomList){
+	    if(chattingRoomList.eq(key).attr('roomnum')==roomNum){
+	      alert('이미 존재하는 채팅 방의 리스트를 수정합니다.');
+	      var names = $('.chattingRoomNames').eq(key).text();       //해당하는 채팅룸의 유저들 네임 읽음
+	      var temp = Number($('.chattingRoomUnreadCount').eq(key).text());  //해당하는 채팅룸의 안읽음 수
+	      chattingRoomList.eq(key).remove();
+	      var unreadCount = ($('#myModalLabel').attr('roomnum')==roomNum) ? 0 : temp+1; //모달창이 열려있으면 0 아니면원래 숫자에서 1추가
+	      $('#chattingRoomList').append('<li class="list-group-item" roomnum='+roomNum+'><span class="chattingRoomNames">'+
+	          names+ '</span>-->'+message+'<span class="badge chattingRoomUnreadCount">'+unreadCount+'</span>'+'</li>');
+	      return;
+	    }//if
+	  }//for
+	  alert('존재하는 방이 없는 것으로 실행');
+	  $('#chattingRoomList').append('<li class="list-group-item openChatting" isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
+	      data.unreadPeople+ '</span>-->'+message+'<span class="badge chattingRoomUnreadCount">'+1+'</span>'+'</li>');
+	  return;
+
+
 	});
 	//해당하는 채팅창에 존재할 때 메세지가 들어오면 발생하는 이벤트
 	socket.on('receiveMessageToRoom', function(data){

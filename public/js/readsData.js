@@ -50,7 +50,15 @@ $( document ).ready(function(){
 		data : {id : id},
 		dataType : "json",
 		success: function(data){
-			alert(JSON.stringify(data));
+			data.forEach(function(obj, index){
+			  var names = ''
+			    obj.names.forEach(function(obj2, index){
+			      names+= obj2.name+'/';
+			    });
+			  $('#chattingRoomList').append('<li class="list-group-item openChatting" isChattList="true" roomnum='+obj.roomnum+'><span class="chattingRoomNames">'+
+			      names+ '</span><span class="badge chattingRoomUnreadCount">'+obj.unreadMessageCount+
+			      '</span>'+'</li>');
+			});
 		},
 		error: function(xhr, status, error) {
 			alert(error);

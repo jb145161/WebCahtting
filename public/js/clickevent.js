@@ -164,7 +164,12 @@ $( document ).ready(function(){
 					alert(error);
 				}   
 			});
-			
+			if(tdObject.attr('isChattList')=='true'){  //채팅리스트에서 열린것인지 확인
+			  var index = $('.list-group-item').index(tdObject);
+			  var count = Number($('.chattingRoomUnreadCount').eq(index).text());
+			  if(count != 0)  $('.chattingRoomUnreadCount').eq(index).text(0); //해당하는 채팅룸의 방에 안읽음 수가 0이 아닐 때 0으로...
+			  
+			}
 		}
 		
 		$('#myModalLabel').text(tdObject.text());	//모달창 제목에 상대편 이름 입력
