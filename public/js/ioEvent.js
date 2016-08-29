@@ -41,7 +41,6 @@ $( document ).ready(function(){
 	});
 	//io를 통해서 새로운 방 생성 번호를 알려줌
 	socket.on('receiveNewRoomNum', function(data){
-		alert(JSON.stringify(data));
 		var roomNum = data.roomNum;
 		var targetId = data.id;
 		//td태그 중 target속성이 해당 아이디인 tr태그 검색
@@ -57,7 +56,6 @@ $( document ).ready(function(){
 	});
 	//메세지 들어오면 발생하는 이벤트
 	socket.on('receiveMessage', function(data){
-	  alert('메세지 도착 : '+JSON.stringify(data));
 	  var roomNum = data.roomNum;
 	  var message = data.message;
 	  //해당 사용자의 방 리스트들 중에 이미 생성되어있는지 확인. 있으면 이미 있는 방 지우고 새로 append 해주기. 아니면 새로 append와 badge에 1추가
@@ -67,17 +65,22 @@ $( document ).ready(function(){
 
 	  for(var key in chattingRoomList){
 	    if(chattingRoomList.eq(key).attr('roomnum')==roomNum){
-	      alert('이미 존재하는 채팅 방의 리스트를 수정합니다.');
 	      var names = $('.chattingRoomNames').eq(key).text();       //해당하는 채팅룸의 유저들 네임 읽음
 	      var temp = Number($('.chattingRoomUnreadCount').eq(key).text());  //해당하는 채팅룸의 안읽음 수
 	      chattingRoomList.eq(key).remove();
-	      var unreadCount = ($('#myModalLabel').attr('roomnum')==roomNum) ? 0 : temp+1; //모달창이 열려있으면 0 아니면원래 숫자에서 1추가
-	      $('#chattingRoomList').append('<li class="list-group-item" roomnum='+roomNum+'><span class="chattingRoomNames">'+
+	      var unreadCount = 0;
+	      if($('#myModalLabel').attr('roomnum')!=roomNum){ //모달창이 열려있으면 0 아니면원래 숫자에서 1추가
+	        unreadCount = temp+1;
+	        var count = Number($('#chattingMessageCount').text()); //탭에서 새로운 메세지 리드 사실 통지
+	        count += 1;
+	        $('#chattingMessageCount').text(count);
+	      }
+//	      var unreadCount = ($('#myModalLabel').attr('roomnum')==roomNum) ? 0 : temp+1; 
+	      $('#chattingRoomList').append('<li class="list-group-item openChatting"  isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
 	          names+ '</span>-->'+message+'<span class="badge chattingRoomUnreadCount">'+unreadCount+'</span>'+'</li>');
 	      return;
 	    }//if
 	  }//for
-	  alert('존재하는 방이 없는 것으로 실행');
 	  $('#chattingRoomList').append('<li class="list-group-item openChatting" isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
 	      data.unreadPeople+ '</span>-->'+message+'<span class="badge chattingRoomUnreadCount">'+1+'</span>'+'</li>');
 	  return;
@@ -86,7 +89,6 @@ $( document ).ready(function(){
 	});
 	//해당하는 채팅창에 존재할 때 메세지가 들어오면 발생하는 이벤트
 	socket.on('receiveMessageToRoom', function(data){
-		alert('채팅 중 메세지 도착 : '+JSON.stringify(data));
 		readMessage();	//clickevent메소드. 서버로 ajax 요청을 통해 읽었다는 사실 전달
 		var unreadCount = data.unreadPeople.split('||').length;
 		$('#chattingArea').append('<div>'+data.name+'<span class="label label-success">'+new Date()+'</span>'+'</div>');
@@ -105,14 +107,12 @@ $( document ).ready(function(){
 	});
 	//IO를 통해 받으면 지금 방에 있는 사람들에게 제일 최근 메세지의 unreadCount를 -1
 	socket.on('discountUnreadInRoom', function(data){
-		alert('현재 방의 메세지 안읽음 수를 전부 -1 해달라는 요청을 받았습니다.');
 		var unreadCount = $('.unreadCount').last().text();
 		unreadCount -= 1;
 		$('.unreadCount').last().text(unreadCount);
 	});
 	//IO를 통해 받으면 입장한 방에 있는 사람들에게 내가 안읽은 메세지들의 unreadCount 를 -1
 	socket.on('discountUnread', function(count){
-		alert('입장한 사람이 메세지를 '+count+'개 읽었습니다.');
 		var index = $('.unreadCount').index($('.unreadCount:last'));	//마지막 채팅 인덱스
 		for(var i = 0; i<count; i++){
 			var unreadCount = $('.unreadCount').eq(index).text();
@@ -175,9 +175,7 @@ function readMessage(){
 		dataType : "json",
 		success: function(data){
 			if(data.result=='success'){
-				alert('readMessage ajax 성공 count = '+data.count);
 				count = data.count;
-				alert(count +' 를 리턴합니다');
 				return count;
 			}
 		},

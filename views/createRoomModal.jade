@@ -1,0 +1,17 @@
+#createRoomModal.modal.fade
+    .modal-dialog
+        .modal-content
+            .modal-header
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                |         
+                h4.modal-title 채팅방 만들기
+            |       
+            .modal-body
+                input#chattUsers(type='text' readonly='true')
+                #createRoomContent
+            |       
+            .modal-footer
+                button.btn.btn-default(type='button', data-dismiss='modal') Close
+                |         
+                button#createRoomBtn.btn.btn-primary(type='button') Create ChattingRoom

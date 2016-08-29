@@ -413,4 +413,59 @@ router.post('/readMessage', function(req, res){
 	
 });
 
+router.post('/createMultiChatt', function(req, res){
+  var userArray = req.body.userArray;
+  client.beginTransaction(function(error){
+    if(error){
+      console.log(error);
+      throw error;
+    }//if
+    client.query('insert into roomnumseq value()', function(error){
+      if(error){
+        console.log(error);
+        client.rollback(function(){
+          console.error('rollback error');
+                    throw error;
+        });
+        throw error;
+      }//if error
+      userArray.forEach(function(target, index){
+        client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?,0)', [target], function(error){
+          if(error){
+            console.log(error);
+            client.rollback(function(){
+              console.error('rollback error');
+                        throw error;
+            });
+            throw error;
+          }//if error
+        });//for query
+      });//forEach
+      client.query('select LAST_INSERT_ID() as roomNum',  //생성한 방넘버 전달
+          function(error, result){
+        if(error){
+          console.log(error);
+          client.rollback(function(){
+            console.error('rollback error');
+                      throw error;
+          });
+          throw error;
+        }//if error
+        client.commit(function(error){
+          if(error){
+            console.log(error);
+            client.rollback(function(){
+              console.error('rollback error');
+                        throw error;
+            });
+            throw error;
+          }//if error
+          res.send(result);
+        });//commit
+      });//select query
+    });//first query
+  }//begin transaction
+});
+
+
 module.exports = router;
