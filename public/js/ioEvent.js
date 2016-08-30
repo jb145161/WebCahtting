@@ -76,12 +76,12 @@ $( document ).ready(function(){
 	        $('#chattingMessageCount').text(count);
 	      }
 //	      var unreadCount = ($('#myModalLabel').attr('roomnum')==roomNum) ? 0 : temp+1; 
-	      $('#chattingRoomList').append('<li class="list-group-item openChatting"  isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
+	      $('#chattingRoomList').prepend('<li class="list-group-item openChatting"  isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
 	          names+ '</span>-->'+message+'<span class="badge chattingRoomUnreadCount">'+unreadCount+'</span>'+'</li>');
 	      return;
 	    }//if
 	  }//for
-	  $('#chattingRoomList').append('<li class="list-group-item openChatting" isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
+	  $('#chattingRoomList').prepend('<li class="list-group-item openChatting" isChattList="true" roomnum='+roomNum+'><span class="chattingRoomNames">'+
 	      data.unreadPeople+ '</span>-->'+message+'<span class="badge chattingRoomUnreadCount">'+1+'</span>'+'</li>');
 	  return;
 

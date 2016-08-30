@@ -7,6 +7,9 @@
 var app = require('../app');
 var debug = require('debug')('WebChatting:server');
 var http = require('http');
+var cluster = require('cluster');
+var numCPUs = require('os').cpus().length;
+
 
 /**
  * Get port from environment and store in Express.
@@ -15,19 +18,34 @@ var http = require('http');
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
+if (cluster.isMaster) {
+    // 클러스터 워커 프로세스 포크
+    for (var i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+    
+    cluster.on('exit', function(worker, code, signal) {
+        console.log('worker ' + worker.process.pid + ' died');
+    });
+}else{
 
-var server = http.createServer(app);
-app.io.attach(server);
-/**
- * Listen on provided port, on all network interfaces.
- */
+	/**
+	 * Create HTTP server.
+	 */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+	var server = http.createServer(app);
+	app.io.attach(server);
+	/**
+	 * Listen on provided port, on all network interfaces.
+	 */
+
+	server.listen(port);
+	server.on('error', onError);
+	server.on('listening', onListening);
+
+}
+
+
 
 /**
  * Normalize a port into a number, string, or false.

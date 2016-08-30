@@ -77,7 +77,13 @@ html(lang='en')
         script(type='text/javascript', src='bootstrap/js/bootstrap.js')
         script.
             $('#registBtn').click(function(){
-            	$('#registForm').submit();
+            var idReg = /^[a-z]+[a-z0-9]$/g;
+            if( !idReg.test( $("#name").val() ) ) {
+            alert("아이디는 영문자로 만드셔야합니다");
+            return;
+            }
+            $('#registForm').submit();
             });
+
             
         

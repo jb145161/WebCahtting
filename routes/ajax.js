@@ -1,20 +1,20 @@
 var express = require('express');
 var router = express.Router();
 //var mysql = require('mysql');
-//
+
 //var client = mysql.createConnection({
-//	host:'localhost',
-//	user:'root',
-//	password:'1234',
-//	database: 'chatting',
-//	port: 3306
+//host:'localhost',
+//user:'root',
+//password:'1234',
+//database: 'chatting',
+//port: 3306
 //});
 
 var client = require('../mysqlConfig');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+	res.send('respond with a resource');
 });
 //유저의 정보 요청 처리
 router.post('/readUserInfo', function(req, res){
@@ -33,7 +33,7 @@ router.post('/findFriend', function(req, res){
 	var findID = req.body.id;
 	console.log(findID);
 //	findID = '%'+findID+'%';   //이것을 Like 문으로 사용하면 해당하는 문자열 포함된 모든 유저 반환하게
-	
+
 	client.query('select id from member where id = ?',[findID]
 	, function(error, result){
 		if(error){
@@ -48,8 +48,8 @@ router.post('/findFriend', function(req, res){
 router.post('/friendRequest', function(req, res){
 	var fromId=req.cookies.id;
 	var toId = req.body.findIDResult;
-	
-	
+
+
 	client.query('insert into requestFriend(fromId,toId,requestDate) values(?,?,now())',[fromId, toId],
 			function(error){
 		if(error) {
@@ -82,7 +82,7 @@ router.post('/readFriends',function(req,res){
 			res.send(result);
 		}
 	})
-	
+
 });
 //처음 접속 시 모든 채팅 룸 리스트 읽어옴
 router.post('/readChattingRoomList',function(req, res){
@@ -92,39 +92,41 @@ router.post('/readChattingRoomList',function(req, res){
 			console.log(error);
 			throw error;
 		}
-		client.query('select * from chattingrooms where id = ?', [id],
+		
+		client.query('select c.roomnum, c.id, c.unreadMessageCount from chattingrooms c,'+
+				' (select * from messages order by sendDate) m where c.id = ? and '+
+				'c.roomnum = m.roomNum', [id],
 				function(error, result){
 			if(error){
 				console.log(error);
 				client.rollback(function(){
 					console.error('rollback error');
-                    throw error;
+					throw error;
 				});
 				throw error;
 			}//if error
 			console.log('select chattingrooms : '+JSON.stringify(result));
 			result.forEach(function(obj, index){
-					client.query('select e.name from member e, (select id from chattingrooms where '+
-							'roomnum = ? and id != ?) a where e.id = a.id', [obj.roomnum, id],
-							function(error, result2){
-						if(error){
-							console.log(error);
-							client.rollback(function(){
-								console.error('rollback error');
-			                    throw error;
-							});
+				client.query('select e.name from member e, (select id from chattingrooms where '+
+						'roomnum = ? and id != ?) a where e.id = a.id', [obj.roomnum, id],
+						function(error, result2){
+					if(error){
+						console.log(error);
+						client.rollback(function(){
+							console.error('rollback error');
 							throw error;
-						}//if error
-						console.log('해당 채팅룸 유저의 이름을 읽습니다 : '+JSON.stringify(result2));
-						result[index].names = result2;
-					});//for query
+						});
+						throw error;
+					}//if error
+					result[index].names = result2;
+				});//for query
 			});//forEach
 			client.commit(function(error){
 				if(error){
 					console.log(error);
 					client.rollback(function(){
 						console.error('rollback error');
-	                    throw error;
+						throw error;
 					});
 					throw error;
 				}//if error
@@ -172,7 +174,7 @@ router.post('/createNewRoom', function(req, res){
 				console.log(error);
 				client.rollback(function(){
 					console.error('rollback error');
-                    throw error;
+					throw error;
 				});
 				throw error;
 			}//if error
@@ -183,7 +185,7 @@ router.post('/createNewRoom', function(req, res){
 					console.log(error);
 					client.rollback(function(){
 						console.error('rollback error');
-	                    throw error;
+						throw error;
 					});
 					throw error;
 				}//if error
@@ -194,7 +196,7 @@ router.post('/createNewRoom', function(req, res){
 						console.log(error);
 						client.rollback(function(){
 							console.error('rollback error');
-		                    throw error;
+							throw error;
 						});
 						throw error;
 					}//if error
@@ -206,7 +208,7 @@ router.post('/createNewRoom', function(req, res){
 							console.log(error);
 							client.rollback(function(){
 								console.error('rollback error');
-			                    throw error;
+								throw error;
 							});
 							throw error;
 						}//if error
@@ -216,7 +218,7 @@ router.post('/createNewRoom', function(req, res){
 								console.log(error);
 								client.rollback(function(){
 									console.error('rollback error');
-				                    throw error;
+									throw error;
 								});
 								throw error;
 							}//if error
@@ -225,7 +227,7 @@ router.post('/createNewRoom', function(req, res){
 									console.log(error);
 									client.rollback(function(){
 										console.error('rollback error');
-					                    throw error;
+										throw error;
 									});
 									throw error;
 								}//if error
@@ -258,7 +260,7 @@ router.post('/sendMessage', function(req, res){
 				console.log(error);
 				client.rollback(function(){
 					console.error('rollback error');
-                    throw error;
+					throw error;
 				});
 				throw error;
 			}//if error
@@ -274,7 +276,7 @@ router.post('/sendMessage', function(req, res){
 					console.log(error);
 					client.rollback(function(){
 						console.error('rollback error');
-	                    throw error;
+						throw error;
 					});
 					throw error;
 				}//if error
@@ -288,7 +290,7 @@ router.post('/sendMessage', function(req, res){
 							console.log(error);
 							client.rollback(function(){
 								console.error('rollback error');
-			                    throw error;
+								throw error;
 							});
 							throw error;
 						}//if error
@@ -300,7 +302,7 @@ router.post('/sendMessage', function(req, res){
 						console.log(error);
 						client.rollback(function(){
 							console.error('rollback error');
-		                    throw error;
+							throw error;
 						});
 						throw error;
 					}//if error
@@ -337,7 +339,7 @@ router.post('/readMessage', function(req, res){
 				console.log(error);
 				client.rollback(function(){
 					console.error('rollback error');
-                    throw error;
+					throw error;
 				});
 				throw error;
 			}//if error
@@ -359,7 +361,7 @@ router.post('/readMessage', function(req, res){
 				});//forEach
 			}
 			console.log('get count : '+count);
-			
+
 			var unreadPeople = result[0].unreadPeople;
 			var unreadPeopleArray = unreadPeople.split('||');
 			var newUnreadPeople='';	//수정할 정보 담을 문자변수
@@ -370,7 +372,7 @@ router.post('/readMessage', function(req, res){
 			}//for
 			newUnreadPeople = newUnreadPeople.slice(0,-2);  //마지막에 있는 ||문자열 제거
 			console.log('make new UnreadPeople : '+newUnreadPeople);
-			
+
 			client.query('update messages set unreadPeople = ? where roomNum = ? and'+
 					' (unreadPeople Like ? or unreadPeople Like ? or unreadPeople = ?)',
 					[newUnreadPeople, roomNum, '%||'+id+'%', '%'+id+'||%', id], function(error){
@@ -378,7 +380,7 @@ router.post('/readMessage', function(req, res){
 					console.log(error);
 					client.rollback(function(){
 						console.error('rollback error');
-	                    throw error;
+						throw error;
 					});
 					throw error;
 				}//if error
@@ -389,7 +391,7 @@ router.post('/readMessage', function(req, res){
 						console.log(error);
 						client.rollback(function(){
 							console.error('rollback error');
-		                    throw error;
+							throw error;
 						});
 						throw error;
 					}//if error
@@ -399,7 +401,7 @@ router.post('/readMessage', function(req, res){
 							console.log(error);
 							client.rollback(function(){
 								console.error('rollback error');
-			                    throw error;
+								throw error;
 							});
 							throw error;
 						}//if error
@@ -410,61 +412,65 @@ router.post('/readMessage', function(req, res){
 			});//second query
 		});//first query
 	});//begin transaction 
-	
+
 });
 
 router.post('/createMultiChatt', function(req, res){
-  var userArray = req.body.userArray;
-  client.beginTransaction(function(error){
-    if(error){
-      console.log(error);
-      throw error;
-    }//if
-    client.query('insert into roomnumseq value()', function(error){
-      if(error){
-        console.log(error);
-        client.rollback(function(){
-          console.error('rollback error');
-                    throw error;
-        });
-        throw error;
-      }//if error
-      userArray.forEach(function(target, index){
-        client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?,0)', [target], function(error){
-          if(error){
-            console.log(error);
-            client.rollback(function(){
-              console.error('rollback error');
-                        throw error;
-            });
-            throw error;
-          }//if error
-        });//for query
-      });//forEach
-      client.query('select LAST_INSERT_ID() as roomNum',  //생성한 방넘버 전달
-          function(error, result){
-        if(error){
-          console.log(error);
-          client.rollback(function(){
-            console.error('rollback error');
-                      throw error;
-          });
-          throw error;
-        }//if error
-        client.commit(function(error){
-          if(error){
-            console.log(error);
-            client.rollback(function(){
-              console.error('rollback error');
-                        throw error;
-            });
-            throw error;
-          }//if error
-          res.send(result);
-        });//commit
-      });//select query
-    });//first query
-  }//begin transaction
+	var body = req.body;
+	var userArray = body['userArray[]'];
+	console.log(JSON.stringify(body));
+	client.beginTransaction(function(error){
+		if(error){
+			console.log(error);
+			throw error;
+		}//if
+		client.query('insert into roomnumseq value()', function(error){
+			if(error){
+				console.log(error);
+				client.rollback(function(){
+					console.error('rollback error');
+					throw error;
+				});
+				throw error;
+			}//if error
+			console.log(JSON.stringify(userArray));
+			userArray.forEach(function(target, index){
+				client.query('insert into chattingrooms values((select LAST_INSERT_ID()), ?,0)', [target], function(error){
+					if(error){
+						console.log(error);
+						client.rollback(function(){
+							console.error('rollback error');
+							throw error;
+						});
+						throw error;
+					}//if error
+				});//for query
+				console.log('insert to '+target);
+			});//forEach
+			client.query('select LAST_INSERT_ID() as roomNum',  //생성한 방넘버 전달
+					function(error, result){
+				if(error){
+					console.log(error);
+					client.rollback(function(){
+						console.error('rollback error');
+						throw error;
+					});
+					throw error;
+				}//if error
+				client.commit(function(error){
+					if(error){
+						console.log(error);
+						client.rollback(function(){
+							console.error('rollback error');
+							throw error;
+						});
+						throw error;
+					}//if error
+					res.send(result);
+				});//commit
+			});//select query
+		});//first query
+	});//begin transaction
 });
 
 
