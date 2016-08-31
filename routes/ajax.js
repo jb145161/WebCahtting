@@ -93,9 +93,7 @@ router.post('/readChattingRoomList',function(req, res){
 			throw error;
 		}
 		
-		client.query('select c.roomnum, c.id, c.unreadMessageCount from chattingrooms c,'+
-				' (select * from messages order by sendDate) m where c.id = ? and '+
-				'c.roomnum = m.roomNum', [id],
+		client.query('select * from chattingrooms where id = ?' , [id],
 				function(error, result){
 			if(error){
 				console.log(error);
