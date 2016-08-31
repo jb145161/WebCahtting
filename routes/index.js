@@ -47,7 +47,7 @@ router.post('/login', function(req, res, next) {
 			  }
 				  
 		  }
-		  res.render('login', {result:'success'});
+//		  res.render('login', {result:'success'});
 	  }
 	  
   });

@@ -105,7 +105,7 @@ router.post('/readChattingRoomList',function(req, res){
 				});
 				throw error;
 			}//if error
-			console.log('select chattingrooms : '+JSON.stringify(result));
+			console.log('select chattingrooms');
 			result.forEach(function(obj, index){
 				client.query('select e.name from member e, (select id from chattingrooms where '+
 						'roomnum = ? and id != ?) a where e.id = a.id', [obj.roomnum, id],
